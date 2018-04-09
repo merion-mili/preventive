@@ -1,0 +1,508 @@
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:util="http://java.sun.com/jsf/composite/util">
+
+<h:head>
+	<title>Preventivat</title>
+	<h:outputScript library="primefaces" name="jquery/jquery.js" />
+</h:head>
+
+
+<h:body>
+
+	<h:outputStylesheet library="css" name="responsiveMenu.css" />
+	<ui:composition template="/index2.xhtml">
+
+
+		<ui:define name="content">
+			<h:form id="Form1" styleClass="menuFont">
+				<p:growl id="msgs" showDetail="true" />
+
+				<!-- Context Menu for Preventive -->
+				<p:contextMenu for="dataTable2">
+					<p:menuitem value="Delete" icon="ui-icon-trash"
+						oncomplete="PF('deleteDialog').show()" />
+					
+					<p:menuitem value="AddPreventive" icon="ui-icon-plus"
+						oncomplete="PF('addPreventiveDialog').show()" update="dlgPanel">
+						<f:actionListener binding="#{orderBeanController.setFlag(false)}" />
+					</p:menuitem>
+
+					<p:menuitem value="AddTrack" icon="ui-icon-plus"
+						oncomplete="PF('addPreventiveDialog').show()" update="dlgPanel">
+						<f:actionListener binding="#{orderBeanController.setFlag(true)}" />
+					</p:menuitem>
+
+					<p:menuitem value="Delete Track" icon="ui-icon-trash"
+						oncomplete="PF('deleteDialog2').show()" />
+				</p:contextMenu>
+				
+				<p:confirmDialog id="dialogBoxId"
+					message="Do you want to delete the Article" header="Delete Article"
+					severity="alert" widgetVar="deleteDialog" styleClass="dialogBoxId">
+					<p:commandButton id="confirm" value="Yes"
+						update=":Form1:dataTable2" oncomplete="PF('deleteDialog').hide()"
+						action="#{orderBeanController.deleteOrder}" />
+					<p:commandButton id="decline" value="No"
+						onclick="PF('deleteDialog').hide()" type="button" />
+				</p:confirmDialog>
+
+				<p:confirmDialog id="dialogBoxId2"
+					message="Do you want to delete the Track" header="Delete the Track"
+					severity="alert" widgetVar="deleteDialog2" styleClass="dialogBoxId">
+					<p:commandButton id="confirm2" value="Yes"
+						update=":Form1:dataTable2" oncomplete="PF('deleteDialog2').hide()"
+						action="#{orderBeanController.deleteTrack}" />
+					<p:commandButton id="decline2" value="No"
+						onclick="PF('deleteDialog2').hide()" type="button" />
+				</p:confirmDialog>
+
+				<!-- Table of Articles in Preventive-->
+				<p:dataTable id="dataTable2" rowKey="#{order.orderId}"
+					rowStyleClass="#{order.totalAfter le 0 ? 'colored' : ''}"
+					rowIndexVar="rowIndex" editable="true"
+					value="#{orderBeanController.orderBeans}" var="order"
+					widgetVar="orderTable" editMode="cell"
+					emptyMessage="No preventives found with given criteria"
+					filteredValue="#{orderBeanController.filteredOrders}" rows="20"
+					paginator="true"
+					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} 
+					{PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="15,20,25"
+					currentPageReportTemplate="(Displaying {startRecord} - {endRecord} of 
+       				{totalRecords}, Page: {currentPage}/{totalPages})"
+					selection="#{orderBeanController.selectedOrder}"
+					selectionMode="single">
+
+					<!-- Header of table -->
+					<f:facet name="header">
+					PREVENTIVI
+						<p:outputPanel>
+							<h:outputText value="Search all fields:" styleClass="menuFont;"
+								style="margin-left:850px;" />
+							<p:inputText id="globalFilter"
+								onkeyup="PF('orderTable').filter()" style="width:150px;"
+								placeholder="Enter keyword" />
+						</p:outputPanel>
+					</f:facet>
+
+					<!-- Cell Edit -->
+					<p:ajax event="cellEdit"
+						listener="#{orderBeanController.onCellEdit}" update=":Form1:msgs" />
+					<!-- Id -->
+					<p:column headerText="Id">
+						<h:outputText value="#{rowIndex+1}" styleClass="menuFont" />
+					</p:column>
+
+					<p:column headerText="Date" styleClass="menuFont">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{order.trackingDate}">
+									<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT+3" />
+								</h:outputText>
+							</f:facet>
+							<f:facet name="input">
+								<p:calendar id="popup" value="#{order.trackingDate}"
+									pattern="dd/MM/yyyy" style="width:100%" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+
+					<!-- Artikull Name -->
+					<p:column headerText="Description" sortBy="#{order.artikull.name}"
+						filterBy="#{order.artikull.name}" filterMatchMode="contains"
+						styleClass="menuFont">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{order.artikull.name}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:selectOneMenu id="editartikull" value="#{order.artikull}"
+									filter="true" filterMatchMode="contains" style="width: 100%">
+									<f:selectItems value="#{orderBeanController.listOfArtikull}"
+										var="artikull" itemLabel="#{artikull.name}"
+										itemValue="#{artikull}" />
+									<f:converter converterId="artikullConverter" />
+								</p:selectOneMenu>
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+
+					<!-- Unit Name -->
+					<p:column headerText="Unity" style="text-align: center;"
+						styleClass="menuFont">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{order.unit.unitName}"
+									style="text-align: right" />
+							</f:facet>
+							<f:facet name="input">
+								<h:selectOneMenu id="unit2" value="#{order.unit}"
+									converter="unitConverter" style="width:100%">
+									<f:selectItems value="#{orderBeanController.units}" var="unit"
+										itemLabel="#{unit.unitName}" itemValue="#{unit}" />
+								</h:selectOneMenu>
+
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+
+
+					<!-- gjendje -->
+					<p:column headerText="Gjendje" style="text-align: middle"
+						styleClass="menuFont">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{order.gjendje}" style="float: right" />
+							</f:facet>
+							<f:facet name="input">
+								<h:inputText value="#{order.gjendje}"
+									style="width:100%;text-align: right" label="Gjendje" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+
+					<!-- Quantity -->
+					<p:column headerText="Quantity" style="text-align: middle"
+						styleClass="menuFont">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{order.quantity}" style="float: right" />
+							</f:facet>
+							<f:facet name="input">
+								<h:inputText value="#{order.quantity}"
+									style="width:100%;text-align: right" label="Quantity" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+
+					<p:column headerText="Mbjellje" style="text-align: middle"
+						styleClass="menuFont">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{order.trackQuantity}"
+									style="float: right" />
+							</f:facet>
+							<f:facet name="input">
+								<h:inputText value="#{order.trackQuantity}"
+									style="width:100%;text-align: right" label="Quantity" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+
+					<!-- Price -->
+					<p:column headerText="Price" style="text-align: middle"
+						styleClass="menuFont">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{order.price}" style="float: right">
+									<f:convertNumber pattern="###,###.00" />
+								</h:outputText>
+							</f:facet>
+							<f:facet name="input">
+								<h:inputText value="#{order.price}"
+									style="width:100%;text-align: right" label="Price" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+
+					<!-- Total Per quantity -->
+					<p:column headerText="TotalPerQuantity" style="text-align: middle"
+						styleClass="menuFont">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{order.totalPrice}" style="float: right">
+									<f:convertNumber pattern="###,###.00" />
+								</h:outputText>
+							</f:facet>
+							<f:facet name="input">
+								<h:inputText value="#{order.totalPrice}"
+									style="width:100%;text-align: right" label="Totalprice" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+
+					<!-- Percent  -->
+					<p:column headerText="Discount%" style="text-align: middle"
+						styleClass="menuFont">
+						<p:cellEditor>
+							<f:facet name="output" style="float: right">
+								<h:outputText value="#{order.percent.doubleValue()}"
+									style="float: right">
+									<f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+								</h:outputText>
+
+							</f:facet>
+							<f:facet name="input">
+								<h:inputText value="#{order.percent}"
+									style="width:100%;text-align: right" label="Percentage" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+
+					<!-- Total Discount -->
+
+					<p:column headerText="TotalDiscount" style="text-align: middle"
+						styleClass="menuFont">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{order.discount}" style="float: right">
+									<f:convertNumber pattern="###,###.00" />
+								</h:outputText>
+							</f:facet>
+							<f:facet name="input">
+								<h:inputText value="#{order.discount}"
+									style="width:100%;text-align: right" label="TotalDiscount" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+
+					<p:column headerText="Mbetja" style="text-align: middle"
+						styleClass="menuFont">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{order.totalAfter}" style="float: right">
+									<f:convertNumber pattern="###,###.00" />
+								</h:outputText>
+							</f:facet>
+							<f:facet name="input">
+								<h:inputText value="#{order.totalAfter}"
+									style="width:100%;text-align: right" label="TotalAfter" />
+							</f:facet>
+						</p:cellEditor>
+
+						
+
+
+					</p:column>
+					<!-- 	<p:column headerText="Artikujt" styleClass="menuFont"> -->
+					<p:column filterBy="#{order.flag}" headerText="Artikujt"
+						filterMatchMode="equals" styleClass="menuFont th"
+						style="width:50px">
+						<f:facet name="filter">
+							<p:selectOneMenu onchange="PF('orderTable').filter()"
+								styleClass="menuFont ">
+								<f:converter converterId="javax.faces.Boolean" />
+								<f:selectItem itemLabel="All" itemValue="" />
+								<f:selectItem itemLabel="Yes" itemValue="true" />
+								<f:selectItem itemLabel="No" itemValue="false" />
+							</p:selectOneMenu>
+						</f:facet>
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{order.flag}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:selectOneMenu id="flag1" value="#{order.flag}"
+									style="width: 100%">
+									<f:converter converterId="javax.faces.Boolean" />
+									<f:selectItem itemLabel="true" itemValue="true" />
+									<f:selectItem itemLabel="false" itemValue="false" />
+								</p:selectOneMenu>
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+
+
+					<!-- 	<p:column headerText="Artikujt" styleClass="menuFont"> -->
+					<p:column filterBy="#{order.prevortrack}" headerText="Tracking"
+						filterMatchMode="equals" styleClass="menuFont th"
+						style="width:60px">
+						<f:facet name="filter">
+							<p:selectOneMenu onchange="PF('orderTable').filter()"
+								styleClass="menuFont ">
+								<f:converter converterId="javax.faces.Boolean" />
+								<f:selectItem itemLabel="All" itemValue="" />
+								<f:selectItem itemLabel="Yes" itemValue="true" />
+								<f:selectItem itemLabel="No" itemValue="false" />
+							</p:selectOneMenu>
+						</f:facet>
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{order.prevortrack}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:selectOneMenu id="track" value="#{order.prevortrack}"
+									style="width: 100%">
+									<f:converter converterId="javax.faces.Boolean" />
+									<f:selectItem itemLabel="true" itemValue="true" />
+									<f:selectItem itemLabel="false" itemValue="false" />
+								</p:selectOneMenu>
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column headerText="Track/Select"
+						styleClass="menuFont columnHeader" exportable="false">
+						<p:selectBooleanCheckbox id="trackselect" value="#{order.checked}"
+							style="width:16px;text-align:center" styleClass="menuFont" />
+
+					</p:column>
+					<!-- Footer -->
+					<p:columnGroup type="footer">
+						<p:row>
+							<p:column colspan="8" style="text-align:right"
+								footerText="Totals:" />
+							<p:column id="totalprice"
+								footerText="#{orderBeanController.total}"
+								style="text-align: right">
+							</p:column>
+							<p:column footerText="Total Discount:" style="text-align: right"></p:column>
+							<p:column footerText="#{orderBeanController.totalDiscount}"
+								style="text-align: right">
+							</p:column>
+							<p:column></p:column>
+							<p:column footerText="Article back" style="text-align: middle">
+
+							</p:column>
+							<p:column footerText="Tracking" style="text-align: middle"></p:column>
+							<p:column footerText="Select Track"></p:column>
+
+						</p:row>
+						<p:row>
+							<p:column colspan="8" style="text-align:right"
+								footerText="TotalWithDiscount:" />
+							<p:column id="totalpricewithdiscount"
+								footerText="#{orderBeanController.totalPriceDiscount}"
+								style="text-align: right">
+							</p:column>
+							<p:column></p:column>
+							<p:column></p:column>
+							<p:column></p:column>
+							<p:column></p:column>
+							<p:column></p:column>
+							<p:column></p:column>
+						</p:row>
+					</p:columnGroup>
+
+
+					<!-- Pdf export -->
+					<f:facet name="footer">
+						<h:outputText value="Export PDF and Excel" style="float:right" />
+						<h:commandLink style="float:right">
+							<p:graphicImage value="/resources/images/excel.png" width="24px" />
+							<p:dataExporter type="xls" target="dataTable2"
+								fileName="artikujt"
+								postProcessor="#{orderBeanController.postProcessXLS}" />
+						</h:commandLink>
+						<p:spacer width="20" />
+						<h:commandLink>
+
+						</h:commandLink>
+					</f:facet>
+				</p:dataTable>
+				<p:commandButton value="GO HOME"
+					action="homeUser?faces-redirect=true" />
+				<p:commandButton value="Edit WorkLog"
+					action="#{orderBeanController.getWorkLogPrevetnive}" />
+				<p:commandButton value="Edit ResourceLog"
+					action="#{orderBeanController.getTaskSheetPrevetnive}" />
+				<p:commandButton value="All Element"
+					action="#{orderBeanController.selectedOrder}" />
+				<h:panelGroup id="panelbutton">
+					<p:commandButton value="Add" id="sub"
+						oncomplete="PF('addPreventiveDialog').show()"
+						rendered="#{orderBeanController.disable}" update="dlgPanel">
+						<f:actionListener binding="#{orderBeanController.setFlag(false)}" />
+
+					</p:commandButton>
+				</h:panelGroup>
+				<h:panelGroup id="panelbutton2" style="float: right">
+					<p:commandButton value="AllOrders"
+						action="#{orderBeanController.getAllOrders()}" ajax="false"
+						update=":Form1:dataTable2" />
+				</h:panelGroup>
+
+				<!-- Dialog for Entering Articul in Preventive Article-->
+				<p:dialog id="dlgPanel" header="Add Articles Or Track In Preventive"
+					position="top" widgetVar="addPreventiveDialog" modal="true"
+					resizable="false" showEffect="clip" hideEffect="fold">
+					<p:ajax event="close" update="addArticlPreventive"
+						listener="#{orderBeanController.initDialog()}" />
+					<p:outputPanel id="addArticlPreventive" >
+						<p:panelGrid columns="2">
+							<h:outputLabel for="popupAdd" value="Date:"
+								rendered="#{orderBeanController.flag}" />
+							<p:calendar id="popupAdd" style="width:100%"
+								value="#{orderBeanController.orderBean.trackingDate}"
+								pattern="dd/MM/yyyy" rendered="#{orderBeanController.flag}" />
+
+
+							<h:outputLabel value="Artikull: " />
+							<p:selectOneMenu id="editartikull2"
+								value="#{orderBeanController.orderBean.artikull}" filter="true"
+								filterMatchMode="contains" style="width: 100%"
+								converter="artikullConverter">
+								<f:selectItems value="#{orderBeanController.listOfArtikull}"
+									var="artikull1" itemLabel="#{artikull1.name}"
+									itemValue="#{artikull1}" />
+							</p:selectOneMenu>
+
+							<h:outputLabel value="Unit: " />
+							<p:selectOneMenu id="unit2"
+								value="#{orderBeanController.orderBean.unit}"
+								converter="unitConverter" style="width:100%">
+
+								<f:selectItems value="#{orderBeanController.units}" var="unit"
+									itemLabel="#{unit.unitName}" itemValue="#{unit}" />
+							</p:selectOneMenu>
+
+							<h:outputLabel value="Quantity: "
+								rendered="#{not orderBeanController.flag}" />
+							<p:inputText id="addquantit"
+								value="#{orderBeanController.orderBean.quantity}"
+								style="width:100%" rendered="#{not orderBeanController.flag}" />
+
+							<h:outputLabel value="Price: "
+								rendered="#{not orderBeanController.flag}" />
+							<p:inputText id="aaprice"
+								value="#{orderBeanController.orderBean.price}"
+								style="width:100%" rendered="#{not orderBeanController.flag}" />
+
+							<h:outputLabel value="Discount: "
+								rendered="#{not orderBeanController.flag}" />
+							<p:inputText id="addpercent"
+								value="#{orderBeanController.orderBean.percent}"
+								style="width:100%" rendered="#{not orderBeanController.flag}" />
+
+							<h:outputLabel for="addmbjellje" value="Mbjellje: "
+								rendered="#{orderBeanController.flag}" />
+							<p:inputText id="addmbjellje"
+								value="#{orderBeanController.orderBean.trackQuantity}"
+								style="width:100%" rendered="#{orderBeanController.flag}" />
+
+							<f:facet name="footer">
+								<p:commandButton value="Add Prevetnive"
+									action="#{orderBeanController.addAction()}" update="dataTable2"
+									rendered="#{not orderBeanController.flag}" />
+
+								<p:commandButton value="Add Track"
+									action="#{orderBeanController.addTrack()}" update="dataTable2,msgs"
+									rendered="#{orderBeanController.flag}" />
+							</f:facet>
+						</p:panelGrid>
+					</p:outputPanel>
+				</p:dialog>
+
+
+
+
+				<p:ajaxExceptionHandler
+					type="javax.validation.ConstraintViolationException"
+					update="exceptionPanel" onexception="PF('exceptionPanel').show();" />
+
+				<p:outputPanel id="exceptionPanel"
+					style="width:500px;height:200px;border:1px;font-size:10px;">
+					<p:outputLabel
+						value="Exception Message :: #{pfExceptionHandler.message}"></p:outputLabel>
+
+				</p:outputPanel>
+
+			</h:form>
+		</ui:define>
+	</ui:composition>
+</h:body>
+</html>

@@ -1,0 +1,64 @@
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:util="http://java.sun.com/jsf/composite/util">
+
+<h:head>
+	<title>Preventivat</title>
+
+</h:head>
+<h:outputStylesheet library="css" name="responsiveMenu.css" />
+
+<h:body>
+
+	<ui:composition template="/index2.xhtml">
+
+		<div id="top"></div>
+		<ui:define name="content">
+			<h:form id="Form1" styleClass="menuFont">
+				<p:messages autoUpdate="true" />
+				
+				<p:dataTable id="dataTable2"
+					value="#{userBeanController.preventives}" var="preventive">
+					<f:facet name="header">
+				            Preventivat
+				        </f:facet>
+					<p:column headerText="Klient">
+						<h:outputText value="#{preventive.emriKlientit}" />
+					</p:column>
+					<p:column headerText="Email">
+						<h:outputText value="#{preventive.email}" />
+					</p:column>
+					<p:column headerText="Location">
+						<h:outputText value="#{preventive.location}" />
+					</p:column>
+					<p:column headerText="Manaxheri">
+						<h:outputText value="#{preventive.user.userName}" />
+					</p:column>
+					<p:column headerText="Vlera">
+						<h:outputText value="#{preventive.vlera}" />
+					</p:column>
+					<p:column headerText="Statusi">
+						<h:outputText value="#{preventive.status}" />
+					</p:column>
+					<p:column headerText="Statusi i punimeve">
+						<h:outputText value="#{preventive.statusiPunimeve}" />
+					</p:column>
+					<p:column headerText="Paradhenie">
+						<h:outputText value="#{preventive.paradhenie}" />
+					</p:column>
+					<p:column headerText="Vlera e Mbetur">
+						<h:outputText value="#{preventive.vleraMbetur}" />
+					</p:column>
+
+				</p:dataTable>
+
+	
+			</h:form>
+		</ui:define>
+	</ui:composition>
+</h:body>
+</html>

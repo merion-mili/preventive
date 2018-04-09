@@ -1,0 +1,134 @@
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<h:head>
+ <title>Standing</title>
+</h:head>
+<h:outputStylesheet library="css" name="responsiveMenu.css" />
+
+<h:body>
+
+<ui:composition template="/index2.xhtml">
+
+<div id="top">
+</div>
+	<ui:define name="content">
+	<h:form id="Form2" styleClass="menuFont">
+		<p:messages autoUpdate="true" />
+
+		<h:panelGrid columns="6" style="margin-bottom:10px" cellpadding="5">
+			<p:outputLabel for="season" value="Season:" />
+			<p:selectOneMenu id="season" value="#{standingTableView.season}"
+				style="width:125px" converter="seasonConverter" >
+				<p:ajax  update="league,panelbutton" listener="#{standingTableView.handleSeasonChange}"/>
+				<f:selectItem itemLabel="Select One" noSelectionOption="true"  />
+				<f:selectItems value="#{standingTableView.seasons}" var="season"
+					itemLabel="#{season.beginn}" itemValue="#{season}" />
+			</p:selectOneMenu>
+
+			<p:outputLabel for="league" value="League " />
+			<p:selectOneMenu id="league" value="#{standingTableView.league}"
+				converter="leagueConverter">
+				<p:ajax update="week,panelbutton"  listener="#{standingTableView.handleLeagueChange}"/>
+				<f:selectItem itemLabel="Select One" noSelectionOption="true"  />
+				<f:selectItems value="#{standingTableView.leagues}" var="league"
+					itemLabel="#{league.leagueName}" itemValue="#{league}" />
+			</p:selectOneMenu>
+			<p:outputLabel for="week" value="Week: " />
+			<p:selectOneMenu id="week" value="#{standingTableView.week}" converter="javax.faces.Integer">
+				<f:selectItems value="#{standingTableView.weeks}" var="week"
+					itemLabel="#{week}" itemValue="#{week}" />
+			</p:selectOneMenu>
+		</h:panelGrid>
+		<h:panelGroup id="panelbutton">
+		<p:commandButton value="Submit" id="sub" action="#{standingTableView.testHome()}" 
+		update="dataTable3 dataTable4" rendered="#{standingTableView.disable}" >
+   
+    <f:ajax execute="@form" render=":Form2:dataTable4"/>
+    <f:ajax execute="@form" render=":Form2:dataTable3"/>
+    
+   
+    </p:commandButton>
+    </h:panelGroup>
+
+		<p:dataTable id="dataTable3" rowIndexVar="rowIndex" value="#{standingTableView.itemsHome}" var="itemHomeTable">
+
+		<f:facet name="header">
+            Home Match Table
+        </f:facet>
+       		<p:column headerText="Pl."  sortBy="#{rowIndex+1}">
+				<h:outputText value="#{rowIndex+1}" />
+			</p:column>
+        
+			<p:column headerText="Team Name" sortBy="#{itemHomeTable.teamName}" >
+				<h:outputText value="#{itemHomeTable.teamName}" />
+			</p:column>
+
+			<p:column headerText="Games">
+				<h:outputText value="#{itemHomeTable.numberOfGames}" />
+			</p:column>
+			
+			<p:column headerText="W">
+				<h:outputText value="#{itemHomeTable.numberWin}" />
+			</p:column>
+			<p:column headerText="D">
+				<h:outputText value="#{itemHomeTable.numberOfDraw}" />
+			</p:column>
+			<p:column headerText="L">
+				<h:outputText value="#{itemHomeTable.numberOfLost}" />
+			</p:column>
+			<p:column headerText="Goals">
+				<h:outputText value="#{itemHomeTable.totalHomeGoal}:#{itemHomeTable.totalAwayGoal}" />
+			</p:column>
+			<p:column headerText="Difference">
+				<h:outputText value="#{itemHomeTable.totalGoalDifference}" />
+			</p:column>
+			<p:column headerText="Points">
+				<h:outputText value="#{itemHomeTable.totalPoint}"/>
+			</p:column>
+
+		</p:dataTable>
+		
+		<p:dataTable id="dataTable4" value="#{standingTableView.itemsAway}" var="itemAwayTable">
+
+		<f:facet name="header">
+            Away Match Table
+        </f:facet>
+			<p:column headerText="Team Name" sortBy="#{itemAwayTable.teamName}" >
+				<h:outputText value="#{itemAwayTable.teamName}" />
+			</p:column>
+
+			<p:column headerText="Games" sortBy="#{itemAwayTable.numberOfGames}" >
+				<h:outputText value="#{itemAwayTable.numberOfGames}" />
+			</p:column>
+			
+			<p:column headerText="W" sortBy="#{itemAwayTable.numberWin}" >
+				<h:outputText value="#{itemAwayTable.numberWin}" />
+			</p:column>
+			<p:column headerText="D" sortBy="#{itemAwayTable.numberOfDraw}" >
+				<h:outputText value="#{itemAwayTable.numberOfDraw}" />
+			</p:column>
+			<p:column headerText="L" sortBy="#{itemAwayTable.numberOfLost}" >
+				<h:outputText value="#{itemAwayTable.numberOfLost}" />
+			</p:column>
+			<p:column headerText="Goals" sortBy="#{itemAwayTable.totalAwayGoal}">
+				<h:outputText value="#{itemAwayTable.totalHomeGoal}:#{itemAwayTable.totalAwayGoal}" />
+			</p:column>
+			<p:column headerText="Difference" sortBy="#{itemAwayTable.totalGoalDifference}" >
+				<h:outputText value="#{itemAwayTable.totalGoalDifference}"  />
+			</p:column>
+			<p:column headerText="Points"  sortBy="#{itemAwayTable.totalPoint}" sortOrder="descending">
+				<h:outputText value="#{itemAwayTable.totalPoint}"/>
+			</p:column>
+
+		</p:dataTable>
+
+	</h:form>
+	</ui:define>
+</ui:composition>
+</h:body>
+</html>

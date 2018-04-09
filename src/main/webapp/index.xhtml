@@ -1,0 +1,54 @@
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+
+<h:head>
+	<script name="jquery/jquery.js" library="primefaces"></script>
+</h:head>
+<h:outputStylesheet library="css" name="responsiveMenu.css" />
+<h:body>
+	<div id="top">
+		<h:form  styleClass="menuFont">
+			<p:menubar styleClass="horizontalmenu" >
+				<p:submenu label="European Football" >
+					<p:submenu label="Standing">
+						<p:menuitem value="Home/Away"></p:menuitem>
+						<p:menuitem value="First/Second Round"></p:menuitem>
+						<p:menuitem value="Cross Table"></p:menuitem>
+					</p:submenu>
+					<p:menuitem value="Fixture/Schedule" outcome="fixture"></p:menuitem>
+					<p:menuitem value="Participation"></p:menuitem>
+					<p:menuitem value="Scorer"></p:menuitem>
+					<p:menuitem value="Rating"></p:menuitem>
+					<p:menuitem value="Penalty"></p:menuitem>
+					
+				</p:submenu>
+				<p:submenu label="Champions League" >
+					<p:submenu label="Current Match round">
+						<p:menuitem value="Fixture/Schedule"></p:menuitem>
+						<p:menuitem value="Clubs"></p:menuitem>
+						<p:menuitem value="Scorer"></p:menuitem>
+						<p:menuitem value="Penalty"></p:menuitem>
+						<p:menuitem value="Cards"></p:menuitem>
+					</p:submenu>
+					<p:menuitem value="Events"></p:menuitem>
+					<p:menuitem value="Clubs"></p:menuitem>
+					<p:menuitem value="Qualifications"></p:menuitem>
+					<p:separator />
+					<p:menuitem value="Help"></p:menuitem>
+				</p:submenu>
+			</p:menubar>
+		</h:form>
+</div>
+
+<div id="content">
+<ui:insert name="content"></ui:insert>
+</div>
+	
+
+</h:body>
+</html>

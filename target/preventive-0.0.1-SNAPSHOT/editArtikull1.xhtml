@@ -1,0 +1,162 @@
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:util="http://java.sun.com/jsf/composite/util">
+
+<h:head>
+	<title>Artikull Edit</title>
+	<h:outputScript library="primefaces" name="jquery/jquery.js" />
+</h:head>
+
+
+<h:body>
+
+	<h:outputStylesheet library="css" name="responsiveMenu.css" />
+	<ui:composition template="/index2.xhtml">
+
+
+		<ui:define name="content">
+
+			<h:form id="artikullForm" styleClass="menuFont">
+				<p:growl id="msgs" showDetail="true" />
+				
+				<!-- context menu -->
+				<p:contextMenu for="artikullEdit">
+					<p:menuitem value="Delete" icon="ui-icon-trash"
+						oncomplete="PF('deleteDialog').show()" />
+					<p:menuitem value="Add" icon="ui-icon-plus"
+						oncomplete="PF('addArtikleDialog').show()" />
+				</p:contextMenu>
+				
+				<!-- confirm dialog -->
+				<p:confirmDialog message="Do you want to delete the Article"
+					header="Delete Article" severity="alert" widgetVar="deleteDialog">
+					<p:commandButton id="confirm" value="Yes"
+						update=":artikullForm:artikullEdit"
+						oncomplete="PF('deleteDialog').hide()"
+						action="#{artikullDetailController.deleteArticle}" />
+					<p:commandButton id="decline" value="No"
+						onclick="PF('deleteDialog').hide()" type="button" />
+				</p:confirmDialog>
+
+				<p:dataTable id="artikullEdit" rowIndexVar="rowIndex"
+					rowKey="#{artik.artikullId}" editable="true" editMode="cell"
+					value="#{artikullDetailController.artikullBeans}" var="artik"
+					widgetVar="artikullTable"
+					emptyMessage="No preventives found with given criteria"
+					filteredValue="#{artikullDetailController.filteredArtikull}"
+					rows="20" paginator="true"
+					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} 
+					{PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="15,20,25"
+					selection="#{artikullDetailController.selectedArticle}"
+					selectionMode="single"
+					>
+					
+					<f:facet name="header">  
+                        ARTIKULL LIST  
+                        
+                    </f:facet>
+                    
+                    <p:ajax event="cellEdit"
+						listener="#{artikullDetailController.onCellEdit}"
+						update=":artikullForm:msgs" />
+						
+					<p:column headerText="Id">
+						<h:outputText value="#{rowIndex+1}" styleClass="menuFont" />
+					</p:column>
+
+					<p:column headerText="Name" sortBy="#{artik.name}" filterStyle="width:400px;"
+						filterBy="#{artik.name}" filterMatchMode="contains"
+						styleClass="menuFont" style="text-align: center; width: 400px" >
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{artik.name}" style="float: left"/>
+							</f:facet>
+							<f:facet name="input">
+								<p:inputText value="#{artik.name}" style="width:100%"
+									converter="toUppercaseConverter">
+									<f:ajax event="blur" render="@this" />
+								</p:inputText>
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+
+					<p:column headerText="Klasifikim" styleClass="menuFont"
+						style="text-align: center;">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{artik.description}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputText value="#{artik.description}" style="width:100%"
+									converter="toUppercaseConverter">
+									<f:ajax event="blur" render="@this" />
+								</p:inputText>
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<f:facet name="footer">
+						<h:outputText value=" Export Excel" style="float:right" />
+						<h:commandLink style="float:right">
+							<p:graphicImage value="/resources/images/excel.png" width="24px" />
+							<p:dataExporter type="xls" target="artikullEdit"
+								fileName="artikujt"
+								postProcessor="#{preventiveBeanController.postProcessXLS}" />
+						</h:commandLink>
+						<p:spacer width="20" />
+						<h:commandLink>
+							
+						</h:commandLink>
+				</f:facet>
+
+				</p:dataTable>
+				<h:panelGroup id="panelbutton">
+					<p:commandButton value="Add" id="sub"
+							oncomplete="PF('addArtikleDialog').show()" 
+						 rendered="#{artikullDetailController.disable}">
+					</p:commandButton>
+				</h:panelGroup>
+				
+				<!-- Dialog for entering Articles in Articel table -->
+				<p:dialog header="New Article" widgetVar="addArtikleDialog"
+					modal="true" resizable="false" showEffect="clip" hideEffect="fold">
+					<p:ajax event="close" update="addArtikle"
+						listener="#{artikullDetailController.initDialog()}" />
+					<p:outputPanel id="addArtikle">
+
+						<p:panelGrid columns="2">
+
+							<h:outputLabel value="Name: " />
+							<p:inputText
+								value="#{artikullDetailController.artikullBean.name}"
+								converter="toUppercaseConverter">
+								<f:ajax event="blur" render="@this" />
+							</p:inputText>
+
+							<h:outputLabel value="Klasifikimi: " />
+							<p:inputText
+								value="#{artikullDetailController.artikullBean.description}"
+								converter="toUppercaseConverter">
+								<f:ajax event="blur" render="@this" />
+							</p:inputText>
+
+							<f:facet name="footer">
+							
+								<h:commandButton value="Add Artikull"
+									action="#{artikullDetailController.addAction}"
+									update="artikullEdit" />
+							
+							</f:facet>
+						</p:panelGrid>
+					</p:outputPanel>
+				</p:dialog>
+			</h:form>
+
+		</ui:define>
+	</ui:composition>
+</h:body>
+</html>

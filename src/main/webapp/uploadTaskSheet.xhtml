@@ -1,0 +1,42 @@
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<h:head>
+	<title>Upload</title>
+</h:head>
+<h:outputStylesheet library="css" name="responsiveMenu.css" />
+
+<h:body>
+
+	<ui:composition template="/index2.xhtml">
+
+		<div id="top"></div>
+		<ui:define name="content">
+			<h:form id="Form1" styleClass="menuFont"
+				enctype="multipart/form-data">
+
+				<p:fileUpload fileUploadListener="#{fileUpload.uploadTaskSheet}" mode="advanced" 
+                  multiple="true" update="messages" sizeLimit="100000" fileLimit="3" allowTypes="/(\.|\/)(gif|jpe?g|csv)$/" />
+				
+				<p:growl id="messages" showDetail="true" />
+				<p:ajaxExceptionHandler type="java.lang.Exception"
+                            update="exceptionDialog"
+                            onexception="PF('exceptionDialog').show();" />
+
+				<p:outputPanel id="exceptionPanel"
+					style="width:500px;height:200px;border:1px;font-size:10px;">
+					<p:outputLabel value="Exception Type :: #{pfExceptionHandler.type}"></p:outputLabel>
+					<p:outputLabel
+						value="Exception Message :: #{pfExceptionHandler.message}"></p:outputLabel>
+					<p:outputLabel
+						value="Exception StackTrace :: #{pfExceptionHandler.formattedStackTrace}"></p:outputLabel>
+				</p:outputPanel>
+			</h:form>
+		</ui:define>
+	</ui:composition>
+</h:body>
+</html>

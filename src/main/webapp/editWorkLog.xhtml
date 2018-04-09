@@ -1,0 +1,204 @@
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+
+<h:head>
+	<title>Edit WorkLog</title>
+	<h:outputScript library="primefaces" name="jquery/jquery.js" />
+</h:head>
+
+
+<h:body>
+	<h:outputStylesheet library="css" name="responsiveMenu.css" />
+	<ui:composition template="/index2.xhtml">
+
+		<div id="top"></div>
+		<ui:define name="content">
+			<h:form id="logForm" styleClass="menuFont">
+				<p:growl id="msgs" showDetail="true" />
+
+
+				<p:contextMenu for="logEdit">
+					<p:menuitem value="Delete" icon="ui-icon-trash"
+						oncomplete="PF('deleteDialog').show()" />
+					<p:menuitem value="Add" icon="ui-icon-plus"
+						oncomplete="PF('addLogDialog').show()" />
+				</p:contextMenu>
+
+				<!-- confirm dialog -->
+				<p:confirmDialog message="Do you want to delete the WorkLog"  
+					header="Delete WorkLog" severity="alert" widgetVar="deleteDialog">
+					
+					<p:commandButton id="confirm" value="Yes" update=":logForm:msgs"
+						oncomplete="PF('deleteDialog').hide()"
+						action="#{workLogDetailController.deleteWorkLog}" />
+					<p:commandButton id="decline" value="No"
+						onclick="PF('deleteDialog').hide()" type="button" />
+					
+				</p:confirmDialog>
+
+				<!--  Edit WorkLog Tables -->
+				<p:dataTable id="logEdit" editable="true"
+					value="#{workLogDetailController.workLogBeans}" var="worklog"
+					rowIndexVar="rowIndex" rowKey="#{worklog.workLogId}"
+					editMode="cell" rows="20" paginator="true"
+					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} 
+					{PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="15,20,25"
+					selection="#{workLogDetailController.selectedWorkLog}"
+					selectionMode="single">
+
+					<f:facet name="header">  
+                        
+                       WORKLOG-EDIT
+                        
+                    </f:facet>
+
+					<p:ajax event="cellEdit"
+						listener="#{workLogDetailController.onCellEdit}"
+						update=":logForm:msgs" />
+					<p:column headerText="Id">
+						<h:outputText value="#{rowIndex+1}" styleClass="menuFont" />
+					</p:column>
+
+					<p:column headerText="Date" styleClass="menuFont">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{worklog.date}">
+									<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT+3" />
+								</h:outputText>
+							</f:facet>
+							<f:facet name="input">
+								<p:calendar id="popup" value="#{worklog.date}"
+									pattern="dd/MM/yyyy" style="width:100%" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+
+					<!-- preventive-->
+					<p:column headerText="Preventive" styleClass="menuFont">
+						<h:outputText
+							value="#{worklog.preventive.preventiveId}-#{worklog.preventive.objekti}-#{worklog.preventive.customer.emriPlote}" />
+					</p:column>
+
+					<!-- Task -->
+					<p:column headerText="Task" styleClass="menuFont">
+						<p:cellEditor>
+						
+						<f:facet name="output">
+						<ui:repeat var="item" value="#{worklog.task}">
+            					 <h:outputText value="#{item.name} " />
+        				</ui:repeat>
+					</f:facet>
+							<f:facet name="input">
+							<p:selectManyMenu id="taskAdd"
+								value="#{worklog.task}" collectionType="java.util.ArrayList"
+								filter="true" filterMatchMode="contains" style="width: 100%"
+								converter="taskConverter" showCheckbox="true">
+								<f:selectItems value="#{workLogDetailController.tasks}"
+									var="task" itemLabel="#{task.name}" itemValue="#{task}" />
+							</p:selectManyMenu>
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+
+					<!-- Nr of worker -->
+					<p:column headerText="Nr/Worker" styleClass="menuFont">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{worklog.numberofWorker}"
+									style="float: right" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputText value="#{worklog.numberofWorker}" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+
+					<!-- Nr of worker -->
+					<p:column headerText="Nr/Equip" styleClass="menuFont">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{worklog.numberOfEquipment}"
+									style="float: right" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputText value="#{worklog.numberOfEquipment}" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+
+					<!-- oret e punuara -->
+					<p:column headerText="Ore" styleClass="menuFont">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{worklog.oretEPunuara}"
+									style="float: right" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputText value="#{worklog.oretEPunuara}" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+
+				</p:dataTable>
+				<!-- button-->
+				<h:panelGroup id="panelbutton">
+				<p:commandButton value="Go Home" action="homeUser?faces-redirect=true" />
+				<p:commandButton value="Go To Order" action="editOrder?faces-redirect=true" />
+					<p:commandButton value="Add WorkLog"
+						oncomplete="PF('addLogDialog').show()">
+					</p:commandButton>
+				</h:panelGroup>
+
+
+				<!--  Dialog for adding articles in preventives -->
+				<p:dialog header="New WorkLog" widgetVar="addLogDialog" modal="true"
+					resizable="false" showEffect="clip" hideEffect="fold">
+					<p:ajax event="close" update="addLog"
+						listener="#{workLogDetailController.initDialog()}" />
+					<p:outputPanel id="addLog">
+						<p:panelGrid columns="2">
+							<h:outputLabel for="popupAdd" value="Date" />
+							<p:calendar id="popupAdd"
+								value="#{workLogDetailController.workLogBean.date}"
+								pattern="dd/MM/yyyy" />
+
+							<h:outputText value="Task:" />
+							<p:selectManyMenu id="taskAdd"
+								value="#{workLogDetailController.workLogBean.task}"
+								filter="true" filterMatchMode="contains" style="width: 100%"
+								converter="taskConverter" showCheckbox="true">
+								<f:selectItems value="#{workLogDetailController.tasks}"
+									var="task" itemLabel="#{task.name}" itemValue="#{task}" />
+							</p:selectManyMenu>
+
+							<h:outputLabel for="addNumberOfWorker" value="Number Of Workers:" />
+							<p:inputText id="addNumberOfWorker"
+								value="#{workLogDetailController.workLogBean.numberofWorker}" />
+
+							<h:outputLabel for="addNumberOfEquipment"
+								value="Number of Equipment" />
+							<p:inputText id="addNumberOfEquipment"
+								value="#{workLogDetailController.workLogBean.numberOfEquipment}" />
+
+							<h:outputLabel for="addOret" value="Oret e Punuara" />
+							<p:inputText id="addOret"
+								value="#{workLogDetailController.workLogBean.oretEPunuara}" />
+
+							<f:facet name="footer">
+								<h:commandButton value="Add WorkLog"
+									action="#{workLogDetailController.addWorkLog()}" />
+							</f:facet>
+						</p:panelGrid>
+					</p:outputPanel>
+				</p:dialog>
+			</h:form>
+		</ui:define>
+	</ui:composition>
+</h:body>
+</html>

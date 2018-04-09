@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- ~ Hibernate, Relational Persistence for Idiomatic Java ~ ~ Copyright 
+	(c) 2010, Red Hat Inc. or third-party contributors as ~ indicated by the 
+	@author tags or express copyright attribution ~ statements applied by the 
+	authors. All third-party contributions are ~ distributed under license by 
+	Red Hat Inc. ~ ~ This copyrighted material is made available to anyone wishing 
+	to use, modify, ~ copy, or redistribute it subject to the terms and conditions 
+	of the GNU ~ Lesser General Public License, as published by the Free Software 
+	Foundation. ~ ~ This program is distributed in the hope that it will be useful, 
+	~ but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+	~ or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public 
+	License ~ for more details. ~ ~ You should have received a copy of the GNU 
+	Lesser General Public License ~ along with this distribution; if not, write 
+	to: ~ Free Software Foundation, Inc. ~ 51 Franklin Street, Fifth Floor ~ 
+	Boston, MA 02110-1301 USA -->
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+
+	<session-factory>
+
+		<!-- Database connection settings -->
+		
+		<property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+		<property name="hibernate.connection.datasource">java:comp/env/jdbc/preventivedb</property>
+		<property name="hibernate.current_session_context_class">thread</property> 
+
+		<!-- <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+		<property name="connection.url">jdbc:mysql://localhost:3306/preventivedb?autoReconnect=true</property>
+		<property name="connection.username">scott</property>
+		<property name="connection.password">tiger</property> -->
+
+		<!-- JDBC connection pool (use the built-in) -->
+
+		<!-- <property name="hibernate.c3p0.min_size">5</property> 
+		<property name="hibernate.c3p0.max_size">100</property> 
+			<property name="hibernate.c3p0.timeout">1800</property> 
+			<property name="hibernate.c3p0.max_statements">100</property> 
+			<property name="hibernate.c3p0.idle_test_period">100</property> -->
+<!-- 
+		<property name="hibernate.c3p0.min_size">5</property>
+		<property name="hibernate.c3p0.max_size">100</property>
+		<property name="hibernate.c3p0.timeout">300</property>
+		<property name="hibernate.c3p0.max_statements">100</property>
+		<property name="hibernate.c3p0.idle_test_period">3000</property>
+		<property name="hibernate.c3p0.testConnectionOnCheckout" >true</property> -->
+		
+		<!--  <property name="acquireIncrement">3</property>
+        <property name="idleConnectionTestPeriod">5</property>
+        <property name="maxConnectionAge">30</property>
+        <property name="maxIdleTime">10</property>
+        <property name="maxPoolSize">25</property>
+        <property name="maxStatements">0</property>
+        <property name="minPoolSize">5</property>
+        <property name="preferredTestQuery">SELECT 1</property>
+        <property name="testConnectionOnCheckin">true</property>
+        <property name="testConnectionOnCheckout">true</property> -->
+	
+
+		<!-- SQL dialect -->
+		<property name="dialect">org.hibernate.dialect.MySQLDialect</property>
+
+		<!-- Disable the second-level cache -->
+		<property name="cache.provider_class">org.hibernate.cache.internal.NoCacheProvider</property>
+
+		<!-- Echo all executed SQL to stdout -->
+		<property name="show_sql">true</property>
+		<!-- <property name="format_sql">true</property> -->
+
+		<!-- Drop and re-create the database schema on startup -->
+		<property name="hbm2ddl.auto">update</property>
+
+
+
+
+
+		<!-- Names the annotated entity class -->
+		<mapping class="al.mili.preventive.db.model.Preventive" />
+		<mapping class="al.mili.preventive.db.model.UsersRole" />
+		<mapping class="al.mili.preventive.db.model.User" />
+		<mapping class="al.mili.preventive.db.model.Order" />
+		<mapping class="al.mili.preventive.db.model.Unit" />
+		<mapping class="al.mili.preventive.db.model.Customer" />
+		<mapping class="al.mili.preventive.db.model.Artikull" />
+		<mapping class="al.mili.preventive.db.model.ResourceType" />
+		<mapping class="al.mili.preventive.db.model.Resources" />
+		<mapping class="al.mili.preventive.db.model.Task" />
+		<mapping class="al.mili.preventive.db.model.TaskSheet" />
+		<mapping class="al.mili.preventive.db.model.WorkLog" />
+		<mapping class="al.mili.preventive.db.model.KompoziteArtikel" />
+
+	</session-factory>
+
+</hibernate-configuration>

@@ -1,0 +1,132 @@
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:util="http://java.sun.com/jsf/composite/util">
+
+<h:head>
+	<title>Resourset</title>
+	<script library="primefaces" name="jquery/jquery.js" />
+</h:head>
+
+
+<h:body>
+
+	<h:outputStylesheet library="css" name="responsiveMenu.css" />
+	<ui:composition template="/index2.xhtml">
+
+
+		<ui:define name="content">
+
+			<h:form id="taskSheetU" styleClass="menuFont">
+				<p:growl id="msgs" showDetail="true" />
+
+
+				<p:dataTable id="taskSheetTable" rowIndexVar="rowIndex"
+					rowKey="#{task.sheetId}"
+					value="#{taskSheetBeanController.taskSheets}" var="task"
+					widgetVar="taskSheetTable"
+					emptyMessage="No resources found with given criteria"
+					filteredValue="#{resourcesController.fileteredResources}" rows="20"
+					paginator="true"
+					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} 
+					{PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="15,20,25">
+
+					<f:facet name="header">  
+                        TASK-SHEET
+                        
+                   <p:commandButton id="toggler" type="button"
+							value="Columns" style="float:right;margin:15px 10px 7px 10px" />
+						<p:columnToggler datasource="taskSheetTable" trigger="toggler" />
+						<p:outputPanel>
+							<h:outputText value="Search all fields:" styleClass="menuFont;"
+								style="margin-left:800px;" />
+							<p:inputText id="globalFilter"
+								onkeyup="PF('taskSheetTable').filter()" style="width:150px;"
+								placeholder="Enter keyword">
+							</p:inputText>
+						</p:outputPanel>
+					</f:facet>
+
+
+					<p:column headerText="Id" styleClass="menuFont" style="width: 30px">
+						<h:outputText value="#{rowIndex+1}" />
+					</p:column>
+
+					<p:column headerText="Date" styleClass="menuFont" style="width: 90px">
+						<h:outputText value="#{task.date}" style="float: left">
+							<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT+3" />
+						</h:outputText>
+					</p:column>
+
+					<p:column headerText="Preventive" styleClass="menuFont"
+						filterBy="#{task.preventive.customer.emriPlote}" filterStyle="width: 350px"
+						filterMatchMode="contains" style="width: 350px">
+						<h:outputText
+							value="#{task.preventive.preventiveId}- #{task.preventive.customer.emriPlote} 
+						#{task.preventive.objekti}"
+							style="float: left" />
+					</p:column>
+
+					<p:column headerText="Resource" styleClass="menuFont"
+						filterBy="#{task.resources.emri}" filterMatchMode="contains" filterStyle="width: 180px">
+						<h:outputText value="#{task.resources.emri}" style="float: left; width: 180px;" />
+					</p:column>
+
+					<p:column headerText="ResourceType" styleClass="menuFont" style="width: 120px">
+						<h:outputText value="#{task.resources.resourceType.emri}"
+							style="float: left" />
+					</p:column>
+
+					<p:column headerText="StartTime" styleClass="menuFont" style="width: 80px">
+						<h:outputText value="#{task.startTime}" style="float: right">
+							<f:convertDateTime pattern="HH:mm" />
+						</h:outputText>
+					</p:column>
+
+
+
+					<p:column headerText="EndTime" styleClass="menuFont" style="width: 80px">
+						<h:outputText value="#{task.endTime}" style="float: right">
+							<f:convertDateTime pattern="HH:mm" />
+						</h:outputText>
+					</p:column>
+
+					<p:column headerText="Duration" styleClass="menuFont" style="width: 70px">
+						<h:outputText value="#{task.duration}" style="float: right" />
+					</p:column>
+
+					<p:column headerText="Quantity" styleClass="menuFont" style="width: 70px">
+						<h:outputText value="#{task.quantity}" style="float: right" />
+					</p:column>
+
+					<p:column headerText="Unit" styleClass="menuFont" style="width: 70px">
+						<h:outputText value="#{task.unit.unitName}" style="float: right" />
+					</p:column>
+
+
+					<f:facet name="footer">
+						<h:outputText value=" Export Excel" style="float:right" />
+						<h:commandLink style="float:right">
+							<p:graphicImage value="/resources/images/excel.png" width="24px" />
+							<p:dataExporter type="xls" target="taskSheetTable"
+								fileName="mjetet"
+								postProcessor="#{taskSheetBeanController.postProcessXLS}" />
+						</h:commandLink>
+						<p:spacer width="20" />
+						<h:commandLink>
+
+						</h:commandLink>
+					</f:facet>
+
+				</p:dataTable>
+
+			</h:form>
+
+		</ui:define>
+	</ui:composition>
+</h:body>
+</html>

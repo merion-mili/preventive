@@ -1,0 +1,388 @@
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+
+<h:head>
+	<title>Edit Preventives</title>
+	<script library="primefaces" name="jquery/jquery.js" />
+</h:head>
+
+
+<h:body>
+	<h:outputStylesheet library="css" name="responsiveMenu.css" />
+	<ui:composition template="/index2.xhtml">
+
+		<div id="top"></div>
+		<ui:define name="content">
+			<h:form id="orderForm" styleClass="menuFont">
+				<p:growl id="msgs" showDetail="true" />
+
+				
+				<p:contextMenu for="orderEdit">
+					<p:menuitem value="Delete" icon="ui-icon-trash"
+						oncomplete="PF('deleteDialog').show()" />
+					<p:menuitem value="Add" icon="ui-icon-plus"
+						oncomplete="PF('addPreventiveDialog').show()" />
+				</p:contextMenu>
+
+				<!-- confirm dialog -->
+				<p:confirmDialog message="Do you want to delete the Preventive"
+					header="Delete Preventive" severity="alert"
+					widgetVar="deleteDialog">
+					<p:commandButton id="confirm" value="Yes"
+						update=":orderForm:msgs"
+						oncomplete="PF('deleteDialog').hide()"
+						action="#{preventivesMasterDetailController.deletePreventive}" />
+					<p:commandButton id="decline" value="No"
+						onclick="PF('deleteDialog').hide()" type="button" />
+				</p:confirmDialog>
+
+			<!--  Edit Pivot Preventives Tables -->
+				<p:dataTable id="orderEdit" rowKey="#{preventive.preventiveId}" editable="true"
+					value="#{preventivesMasterDetailController.preventiveBeans}"
+					var="preventive"  rowIndexVar="rowIndex" 	widgetVar="pivotPreventives" 
+					editMode="cell" emptyMessage="No preventives found with given criteria"
+					filteredValue="#{preventivesMasterDetailController.filteredPreventives}"
+					rows="20" paginator="true"
+					paginatorTemplate="{CurrentPageReport}  {FirstPageLink} 
+					{PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="15,20,25"
+					selection="#{preventivesMasterDetailController.selectedPreventive}"
+					selectionMode="single">
+
+					<f:facet name="header">  
+                        
+                        Pivot Preventives Edit
+                        
+                    </f:facet>
+
+					<p:ajax event="cellEdit"
+						listener="#{preventivesMasterDetailController.onCellEdit}"
+						update=":orderForm:panelbutton1" />
+					<p:column headerText="Id" style="width:20px">
+						<h:outputText value="#{rowIndex+1}" styleClass="menuFont" />
+					</p:column>
+
+					<!-- customer name -->
+					<p:column headerText="#{msg.client}" styleClass="menuFont"
+						sortBy="#{preventive.customer.emriPlote}"  style="width:120px">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{preventive.customer.emriPlote}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:selectOneMenu id="customername" value="#{preventive.customer}" filter="true"
+									filterMatchMode="contains" style="width: 100%" converter="customerConverter">
+									<f:selectItems
+										value="#{preventivesMasterDetailController.customers}"
+										var="customer" itemLabel="#{customer.emriPlote}" itemValue="#{customer}" />
+									
+								</p:selectOneMenu>
+								
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					
+					<!-- customer contact -->
+					<p:column headerText="#{msg.contact}" styleClass="menuFont"  style="width:120px">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{preventive.email}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputText value="#{preventive.email}" style="width:100%" converter="toUppercaseConverter">
+									<f:ajax event="blur" render="@this" />
+								</p:inputText>
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<!-- protokoll number -->
+					<p:column headerText="Nr/Prot." styleClass="menuFont" style="width:50px">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{preventive.protokollNumber}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputText value="#{preventive.protokollNumber}" style="width:100%"/>
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<!-- version number -->
+					<p:column headerText="Ver." styleClass="menuFont" style="width:20px">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{preventive.varianti}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputText value="#{preventive.varianti}" style="width:100%"/>
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					
+					<!-- preventive object -->
+					<p:column headerText="#{msg.object}" sortBy="#{preventive.objekti}"
+						filterBy="#{order.artikull}" filterMatchMode="contains"
+						styleClass="menuFont" style="width:120px" filterStyle="width: 120px;">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{preventive.objekti}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputText value="#{preventive.objekti}" style="width:100%"
+									 converter="toUppercaseConverter">
+								<f:ajax event="blur" render="@this" />
+							</p:inputText>
+								
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					
+					<!-- preventive object location -->
+					<p:column headerText="#{msg.location}" styleClass="menuFont" style="width:60px">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{preventive.location}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputText value="#{preventive.location}" style="width:100%"
+									 converter="toUppercaseConverter">
+								<f:ajax event="blur" render="@this" />
+							</p:inputText>
+							
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					
+					<!-- preventive status -->
+					<p:column headerText="#{msg.status}" styleClass="menuFont" style="width:20px">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{preventive.status}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputText value="#{preventive.status}" style="width:100%"
+									 converter="toUppercaseConverter">
+								<f:ajax event="blur" render="@this" />
+							</p:inputText>
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					
+					<!-- preventive status job-->
+					<p:column headerText="#{msg.job}" styleClass="menuFont" style="width:60px">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{preventive.statusiPunimeve}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputText value="#{preventive.statusiPunimeve}"
+									style="width:100%" label="statusiPunimeve"
+									
+									 converter="toUppercaseConverter">
+								<f:ajax event="blur" render="@this" />
+							</p:inputText>
+								
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					
+					<!-- preventive status job-->
+					<p:column headerText="#{msg.protocollDate}" styleClass="menuFont" style="width:60px">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{preventive.protokollDate}">
+									<f:convertDateTime pattern="dd/MM/yyyy" timeZone="GMT+3" />
+								</h:outputText>
+							</f:facet>
+							<f:facet name="input">
+								<p:calendar id="popup" value="#{preventive.protokollDate}"
+									pattern="dd/MM/yyyy" style="width:100%" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					
+					<!-- preventive vlera-->
+					<p:column headerText="#{msg.price1}" styleClass="menuFont" style="width:80px">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{preventive.vlera}" style="float:right"/>
+							</f:facet>
+							<f:facet name="input">
+								<p:inputText id="vlera" value="#{preventive.vlera}"
+									style="width:100%" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					
+					<!-- preventive prepay-->
+					<p:column headerText="#{msg.prepay}" styleClass="menuFont" style="width:80px">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{preventive.paradhenie}"  style="float:right"/>
+							</f:facet>
+							<f:facet name="input">
+								<p:inputText value="#{preventive.paradhenie}" style="width:100%" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					
+					<!-- preventive balance-->
+					<p:column headerText="#{msg.balance}" styleClass="menuFont" style="width:80px">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{preventive.vleraMbetur}"  style="float:right"/>
+							</f:facet>
+							<f:facet name="input">
+								<p:inputText value="#{preventive.vleraMbetur}"
+									style="width:100%" />
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<!-- preventive contrat-->
+					<p:column headerText="#{msg.contract}" styleClass="menuFont"  style="width:20px">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{preventive.kontrata ? 'Yes': 'No'}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:selectOneMenu id="kontrata" value="#{preventive.kontrata}"
+									style="width: 100%">
+									<f:converter converterId="javax.faces.Boolean" />
+									<f:selectItem itemLabel="Yes" itemValue="true" />
+									<f:selectItem itemLabel="No" itemValue="false" />
+								</p:selectOneMenu>
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<p:column  headerText="Last" styleClass="menuFont th" style="width:20px">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{preventive.hide ? 'Yes': 'No'}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:selectOneMenu id="hide" value="#{preventive.hide}"
+									style="width: 100%">
+									<f:converter converterId="javax.faces.Boolean" />
+									<f:selectItem itemLabel="Yes" itemValue="true" />
+									<f:selectItem itemLabel="No" itemValue="false" />
+								</p:selectOneMenu>
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					
+				</p:dataTable>
+				<!-- button-->
+				<h:panelGroup id="panelbutton1">
+					<p:commandButton value="Add Preventive"
+						oncomplete="PF('addPreventiveDialog').show()" 
+						 >
+					</p:commandButton>
+				</h:panelGroup>
+				
+
+		<!--  Dialog for adding articles in preventives -->
+				<p:dialog header="New Preventive" widgetVar="addPreventiveDialog"
+					modal="true" resizable="false" showEffect="clip" hideEffect="fold">
+					<p:ajax event="close" update="addPreventive"
+						listener="#{preventivesMasterDetailController.initDialog()}" />
+					<p:outputPanel id="addPreventive">
+						<p:panelGrid columns="2">
+							<h:outputText value="Name" />
+							<p:selectOneMenu id="fullnameAdd"
+								value="#{preventivesMasterDetailController.preventiveBean.customer}"
+								filter="true" filterMatchMode="contains" style="width: 100%" converter="customerConverter">
+								<f:selectItems
+									value="#{preventivesMasterDetailController.customers}"
+									var="cust" itemLabel="#{cust.emriPlote}" itemValue="#{cust}" />
+								
+							</p:selectOneMenu>
+
+							<h:outputText value="Contact" />
+							<p:inputText
+								value="#{preventivesMasterDetailController.preventiveBean.email}" converter="toUppercaseConverter">
+								<f:ajax event="blur" render="@this" />
+							</p:inputText>
+							
+							<h:outputText value="Protokoll" />
+							<p:inputText
+								value="#{preventivesMasterDetailController.preventiveBean.protokollNumber}" converter="toUppercaseConverter">
+								<f:ajax event="blur" render="@this" />
+							</p:inputText>
+								
+							<h:outputText value="Varianti" />
+							<p:inputText
+								value="#{preventivesMasterDetailController.preventiveBean.varianti}" >
+								<f:ajax event="blur" render="@this" />
+							</p:inputText>
+
+							<h:outputText value="Object" />
+							<p:inputText
+								value="#{preventivesMasterDetailController.preventiveBean.objekti}"
+								 converter="toUppercaseConverter">
+								<f:ajax event="blur" render="@this" />
+							</p:inputText>
+							
+
+							<h:outputText value="Location" />
+							<p:inputText
+								value="#{preventivesMasterDetailController.preventiveBean.location}"
+								 converter="toUppercaseConverter">
+								<f:ajax event="blur" render="@this" />
+							</p:inputText>
+							
+
+							<h:outputText value="Status" />
+							<p:inputText
+								value="#{preventivesMasterDetailController.preventiveBean.status}"
+								 converter="toUppercaseConverter">
+								<f:ajax event="blur" render="@this" />
+							</p:inputText>
+
+							<h:outputText value="JobStatus" />
+							<p:inputText
+								value="#{preventivesMasterDetailController.preventiveBean.statusiPunimeve}"
+								 converter="toUppercaseConverter">
+								<f:ajax event="blur" render="@this" />
+							</p:inputText>
+							
+
+							<h:outputLabel for="popupAdd" value="Date" />
+							<p:calendar id="popupAdd"
+								value="#{preventivesMasterDetailController.preventiveBean.protokollDate}"
+								pattern="dd/MM/yyyy" />
+
+							<h:outputText value="Price" />
+							<p:inputText
+								value="#{preventivesMasterDetailController.preventiveBean.vlera}"
+								 />
+
+							<h:outputText value="Prepay" />
+							<p:inputText
+								value="#{preventivesMasterDetailController.preventiveBean.paradhenie}"
+								/>
+
+							<h:outputText value="Contract" />
+							<p:selectOneMenu id="kontrata1"
+								value="#{preventivesMasterDetailController.preventiveBean.kontrata}"
+								style="width: 100%">
+								<f:converter converterId="javax.faces.Boolean" />
+								<f:selectItem itemLabel="true" itemValue="true" />
+								<f:selectItem itemLabel="false" itemValue="false" />
+							</p:selectOneMenu>
+							<f:facet name="footer">
+								<h:commandButton value="Add Preventive"
+									action="#{preventivesMasterDetailController.addPreventive()}" />
+
+							</f:facet>
+						</p:panelGrid>
+					</p:outputPanel>
+				</p:dialog>
+			</h:form>
+		</ui:define>
+	</ui:composition>
+</h:body>
+</html>

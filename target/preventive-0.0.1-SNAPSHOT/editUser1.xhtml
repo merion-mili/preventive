@@ -1,0 +1,194 @@
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:util="http://java.sun.com/jsf/composite/util"
+	xmlns:pe="http://primefaces.org/ui/extensions">
+
+<h:head>
+	<title>User Edit</title>
+	<script library="primefaces" name="jquery/jquery.js" />
+</h:head>
+
+
+<h:body>
+
+	<h:outputStylesheet library="css" name="responsiveMenu.css" />
+	<ui:composition template="/index2.xhtml">
+
+
+		<ui:define name="content">
+
+			<h:form id="userForm" styleClass="menuFont">
+				<p:growl id="msgs" showDetail="true" />
+
+				<!-- context menu -->
+				<p:contextMenu for="userEdit">
+					<p:menuitem value="Delete" icon="ui-icon-trash"
+						oncomplete="PF('deleteDialog').show()" />
+					<p:menuitem value="Add" icon="ui-icon-plus"
+						oncomplete="PF('addUserDialog').show()" />
+				</p:contextMenu>
+
+				<!-- confirm dialog -->
+				<p:confirmDialog message="Do you want to delete the User"
+					header="Delete User" severity="alert"
+					widgetVar="deleteDialog">
+					<p:commandButton id="confirm" value="Yes"
+						update=":userForm:userEdit"
+						oncomplete="PF('deleteDialog').hide()"
+						action="#{complexMasterDetailController.deleteUser}" />
+					<p:commandButton id="decline" value="No"
+						onclick="PF('deleteDialog').hide()" type="button" />
+				</p:confirmDialog>
+				
+				<p:dataTable id="userEdit" rowIndexVar="rowIndex"
+					editable="true" editMode="cell"  
+					value="#{complexMasterDetailController.userBeans}" var="user"
+					rowKey="#{user.userId}"
+					widgetVar="userTable"
+					selection="#{complexMasterDetailController.selectedUser}"
+					selectionMode="single">
+
+					<!-- table name -->
+					<f:facet name="header">  
+                       USER LIST 
+                    </f:facet>
+					<p:ajax event="cellEdit"
+						listener="#{complexMasterDetailController.onCellEdit}"
+						update=":userForm:msgs" />
+
+					<!-- cusotmer id -->
+					<p:column headerText="Id">
+						<h:outputText value="#{rowIndex+1}" styleClass="menuFont" />
+					</p:column>
+
+					<!--Emri-->
+					<p:column headerText="Emri" sortBy="#{user.emri}"
+							styleClass="menuFont" style="text-align: center;">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{user.emri}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputText value="#{user.emri}" style="width:100%"
+									converter="toUppercaseConverter">
+									<f:ajax event="blur" render="@this" />
+									<!--  <f:validator validatorId="custom.fullnameValidator" />  -->
+								</p:inputText>
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					<!--MbiEmri-->
+					<p:column headerText="Mbiemri"
+							styleClass="menuFont" style="text-align: center;">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{user.mbiemri}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputText value="#{user.mbiemri}" style="width:100%"
+									converter="toUppercaseConverter">
+									<f:ajax event="blur" render="@this" />
+									<f:validator validatorId="custom.fullnameValidator" /> 
+								</p:inputText>
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+					
+					<!--Username-->
+					<p:column headerText="Username" 
+							styleClass="menuFont" style="text-align: center;">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{user.userName}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputText value="#{user.userName}" style="width:100%"
+									/>
+							
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+
+
+				
+
+				<!--Password-->
+					<p:column headerText="Username" 
+							styleClass="menuFont" style="text-align: center;">
+						<p:cellEditor>
+							<f:facet name="output">
+								<h:outputText value="#{user.password}" />
+							</f:facet>
+							<f:facet name="input">
+								<p:inputText value="#{user.password}" style="width:100%"
+									>
+									
+								</p:inputText>
+							</f:facet>
+						</p:cellEditor>
+					</p:column>
+				</p:dataTable>
+				
+				<h:panelGroup id="panelbutton">
+					<p:commandButton value="Add" id="sub"
+							oncomplete="PF('addUserDialog').show()"/> 
+										
+				</h:panelGroup>
+				
+				
+
+				<p:dialog header="New User" widgetVar="addUserDialog"
+					modal="true" resizable="false" showEffect="clip" hideEffect="fold">
+					<p:ajax event="close" update="addUser"
+						listener="#{complexMasterDetailController.initDialog()}" />
+					<p:outputPanel id="addUser">
+						<p:panelGrid columns="2">
+							<h:outputLabel value="Emri : " />
+							<p:inputText
+								value="#{complexMasterDetailController.userBean.emri}"
+								converter="toUppercaseConverter">
+								<f:ajax event="blur" render="@this" />
+								<!-- <f:validator validatorId="custom.fullnameValidator" />  -->
+							</p:inputText>
+							<h:outputLabel value="Mbiemri : " />
+							<p:inputText
+								value="#{complexMasterDetailController.userBean.mbiemri}"
+								converter="toUppercaseConverter">
+								<f:ajax event="blur" render="@this" />
+								<!-- <f:validator validatorId="custom.fullnameValidator" />  -->
+							</p:inputText>
+							<h:outputLabel value="Username : " />
+							<p:inputText
+								value="#{complexMasterDetailController.userBean.userName}"
+								converter="toUppercaseConverter">
+									<f:ajax event="blur" render="@this" />
+								
+							</p:inputText>
+							<h:outputLabel value="Password : " />
+							<p:inputText
+								value="#{complexMasterDetailController.userBean.password}"
+								>
+								<!-- <f:validator validatorId="custom.passwordValidator" />  -->
+							</p:inputText>
+
+						
+							
+							<f:facet name="footer">
+								<h:commandButton value="Add User"
+									action="#{complexMasterDetailController.addUser}"
+									update="userEdit" />
+
+							</f:facet>
+						</p:panelGrid>
+					</p:outputPanel>
+				</p:dialog>
+			</h:form>
+
+		</ui:define>
+	</ui:composition>
+</h:body>
+</html>
